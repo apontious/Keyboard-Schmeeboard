@@ -1,0 +1,57 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 LucidaGrande;\f2\fmodern\fcharset0 Courier;
+}
+{\colortbl;\red255\green255\blue255;\red26\green26\blue26;\red6\green51\blue100;}
+\margl1440\margr1440\vieww11820\viewh13760\viewkind0
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+
+\f0\fs24 \cf0 This sample project goes along with my post on my blog The Powers of Observation:\
+\
+	{\field{\*\fldinst{HYPERLINK "http://subjectiveobserver.wordpress.com/2013/01/10/keyboard-schmeeboard/"}}{\fldrslt http://subjectiveobserver.wordpress.com/2013/01/10/keyboard-schmeeboard/}}\
+\
+The code is released under the MIT license. See here for details: {\field{\*\fldinst{HYPERLINK "http://opensource.org/licenses/mit-license.php"}}{\fldrslt http://opensource.org/licenses/mit-license.php}}\
+\
+To guard against bit rot, the entirety of the post is reproduced below.\
+\
+\'97 Andrew Pontious\
+1/9/2013\
+\
+\pard\pardeftab720\sa140
+
+\f1\b\fs40 \cf2 Keyboard\'a0Schmeeboard\
+\pard\pardeftab720\sa300
+
+\b0\fs26 \cf2 There\'92s a lot to dislike in Apple\'92s rotation APIs.\
+Let\'92s start with how they changed, from iOS 5 to iOS 6, with no buffer period.\
+Normally, when a new API is introduced, the old one is deprecated but still works the same way for a few more major versions. Here, a new version was introduced, and the old version stopped working immediately. (What was the rush?)\
+Then, there\'92s how the keyboard is handled. If you have the keyboard visible on your iOS device, and you rotate the device from portrait to landscape or vice versa, you\'92ll see the keyboard change its width (and change its height slightly), but otherwise remain visible throughout. So you\'92d think that the underlying APIs would reflect that.\
+Nope!\
+Instead, as far as the official APIs are concerned, your application\'92s code is notified that the keyboard is hidden, then that the view is rotated, then that the keyboard is shown again.\
+This totally screws you over if you have content near the bottom of your view, that you want to animate smoothly along with the (always visible) keyboard.\
+I have a GitHub project, (also) called {\field{\*\fldinst{HYPERLINK "https://github.com/apontious/Keyboard-Schmeeboard"}}{\fldrslt \cf3 \ul \ulc3 Keyboard-Schmeeboard}} (because it\'92s a good name), which demonstrates this problem. You\'92ll have to comment out the 
+\f2 #define kIOS5Workaround
+\f1  and 
+\f2 #define kIOS6Workaround
+\f1  lines in 
+\b ViewController.m
+\b0  to see the broken behavior on iOS 5 and iOS 6.\
+As the above line suggests, however, there are workarounds. On iOS 5, you can override 
+\f2 shouldAutorotateToInterfaceOrientation:
+\f1  to tell yourself a rotation is taking place before you\'92re told the keyboard is being hidden. Then, you simply ignore the keyboard-will-hide notification entirely, and use the keyboard-will-show notification to animate your view to the correct new location.\
+Note, you can\'92t do it in the rotation call where you would normally do it if the keyboard weren\'92t visible, because you don\'92t know the new height of the keyboard yet. You could hardcode a keyboard height in the rotation call, but that ignores localized keyboards of variable height, so it\'92s a bad idea.\
+The animation information you\'92re given in the keyboard-will-show method doesn\'92t exactly match the actual rotation animation, but it\'92s all you\'92re going to get, and it\'92s close enough. In Keyboard Schmeeboard, to see the mismatch, uncomment the 
+\f2 #define kIOS5Workaround
+\f1  line again in 
+\b ViewController.m
+\b0 , and when you rotate the app with the keyboard present, look for the telltale slivers of pink color as the animation proceeds, due to the background view showing through. In a real-world project, I\'92d make sure the background view had a color matching the content view, so that such minor differences were unnoticeable.\
+(It occurs to me as I\'92m writing this that I could save off the information from the rotation call, and use it during the keyboard-will-show notification. Too fiddly? Worth exploring, anyway.)\
+In iOS 6, there\'92s a similar call you can override, 
+\f2 supportedInterfaceOrientations
+\f1 . But here\'92s the rub. Unlike the iOS 5 workaround, this iOS 6 call is also called if you just dip your device back and then up again, without rotating it either to the right or the left. If you go ahead and try this on an iOS 6 device (being sure to uncomment the 
+\f2 #define kIOS6Workaround
+\f1  line again in 
+\b ViewController.m
+\b0 ), and then hide the keyboard, the space where the keyboard was will remain pink. Why? Because your \'93is rotating with keyboard\'94 flag was set in 
+\f2 supportedInterfaceOrientations
+\f1  and never turned back off. (Because you weren\'92t actually rotating.)\
+I\'92m actually looking for a solution to this problem right now, so if this rings any bells for people, try out the GitHub project, and let me know your thoughts in the comments or via {\field{\*\fldinst{HYPERLINK "http://twitter.com/apontious"}}{\fldrslt \cf3 \ul \ulc3 Twitter}}.}
