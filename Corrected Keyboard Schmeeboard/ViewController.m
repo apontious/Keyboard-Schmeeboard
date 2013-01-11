@@ -16,13 +16,6 @@
 
 @property (strong) UITapGestureRecognizer *tapGestureRecognizer;
 
-#define kIOS5Workaround
-#define kIOS6Workaround
-
-// Part of iOS 5 workaround
-@property BOOL isKeyboardVisible;
-@property BOOL isRotatingWhileKeyboardVisible;
-
 @end
 
 @implementation ViewController
@@ -67,34 +60,22 @@
 
 - (void)willShowKeyboard:(NSNotification *)notification {
     [self handleKeyboardNotification:notification handler:^(const CGRect frameBegin, const CGRect frameEnd, const double animationDuration, const UIViewAnimationOptions animationOptions) {
-        self.isKeyboardVisible = YES;
-        
-        void (^changeValues)(void) = ^(){
+        UIViewAnimationOptions modifiedAnimationOptions = animationOptions | UIViewAnimationOptionBeginFromCurrentState;
+                
+        [UIView animateWithDuration:animationDuration delay:0 options:modifiedAnimationOptions animations:^(){
             CGRect frame = self.grayView.frame;
             frame.size.height = self.view.bounds.size.height - frameEnd.size.height;
             self.grayView.frame = frame;
-        };
-        
-        if (self.isRotatingWhileKeyboardVisible == NO) {
-            [UIView animateWithDuration:animationDuration delay:0 options:animationOptions animations:changeValues completion:nil];
-        } else {
-            // Part of iOS 5 workaround
-            // Make changes directly, as they will be executed as part of the rotation animation. Animation doesn't match exactly, but close enough.
-            changeValues();
-        }        
+        } completion:nil];
     }];
 }
 - (void)willHideKeyboard:(NSNotification *)notification {
     [self handleKeyboardNotification:notification handler:^(const CGRect frameBegin, const CGRect frameEnd, const double animationDuration, const UIViewAnimationOptions animationOptions) {
-        if (self.isRotatingWhileKeyboardVisible == NO) { // Part of iOS 5 workaround
-            self.isKeyboardVisible = NO;
-            
-            [UIView animateWithDuration:animationDuration delay:0 options:animationOptions animations:^{
-                CGRect frame = self.grayView.frame;
-                frame.size.height = frame.size.height + frameEnd.size.height;;
-                self.grayView.frame = frame;
-            } completion:nil];
-        }
+        [UIView animateWithDuration:animationDuration delay:0 options:animationOptions animations:^{
+            CGRect frame = self.grayView.frame;
+            frame.size.height = frame.size.height + frameEnd.size.height;;
+            self.grayView.frame = frame;
+        } completion:nil];
     }];
 }
 
@@ -121,22 +102,9 @@
     [center removeObserver:self name:UIKeyboardWillHideNotification object:nil];
 }
 
-#pragma mark - Rotation Methods
-
-- (void)didRotateFromInterfaceOrientation:(UIInterfaceOrientation)fromInterfaceOrientation {
-    self.isRotatingWhileKeyboardVisible = NO;
-}
-
 #pragma mark - iOS 5 Rotation Methods
 
 - (BOOL)shouldAutorotateToInterfaceOrientation:(UIInterfaceOrientation)toInterfaceOrientation {
-    // Part of iOS 5 workaround
-    if (self.isKeyboardVisible == YES) {
-#ifdef kIOS5Workaround
-        self.isRotatingWhileKeyboardVisible = YES;
-#endif
-    }
-    
     return YES;
 }
 
@@ -146,13 +114,6 @@
     return YES;
 }
 - (NSUInteger)supportedInterfaceOrientations {
-    // Part of iOS 6 workaround
-    if (self.isKeyboardVisible == YES) {
-#ifdef kIOS6Workaround
-        self.isRotatingWhileKeyboardVisible = YES;
-#endif
-    }
-    
     return UIInterfaceOrientationMaskAll;
 }
 
