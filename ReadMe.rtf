@@ -1,25 +1,29 @@
-{\rtf1\ansi\ansicpg1252\cocoartf1187\cocoasubrtf340
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf470
 {\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fnil\fcharset0 LucidaGrande;\f2\fmodern\fcharset0 Courier;
-}
-{\colortbl;\red255\green255\blue255;\red26\green26\blue26;\red6\green51\blue100;}
+\f3\fnil\fcharset0 HelveticaNeue;\f4\fnil\fcharset0 HelveticaNeue-Light;}
+{\colortbl;\red255\green255\blue255;\red26\green26\blue26;\red6\green51\blue100;\red117\green117\blue117;
+\red36\green89\blue160;\red52\green52\blue52;}
+{\*\listtable{\list\listtemplateid1\listhybrid{\listlevel\levelnfc23\levelnfcn23\leveljc0\leveljcn0\levelfollow0\levelstartat1\levelspace360\levelindent0{\*\levelmarker \{disc\}}{\leveltext\leveltemplateid1\'01\uc0\u8226 ;}{\levelnumbers;}\fi-360\li720\lin720 }{\listname ;}\listid1}}
+{\*\listoverridetable{\listoverride\listid1\listoverridecount0\ls1}}
 \margl1440\margr1440\vieww14780\viewh14200\viewkind0
-\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural
+\pard\tx720\tx1440\tx2160\tx2880\tx3600\tx4320\tx5040\tx5760\tx6480\tx7200\tx7920\tx8640\pardirnatural\partightenfactor0
 
-\f0\fs24 \cf0 This sample project goes along with my post on my blog The Powers of Observation:\
+\f0\fs24 \cf0 This sample project goes with two posts from my blog:\
 \
-	{\field{\*\fldinst{HYPERLINK "http://subjectiveobserver.wordpress.com/2013/01/10/keyboard-schmeeboard/"}}{\fldrslt http://subjectiveobserver.wordpress.com/2013/01/10/keyboard-schmeeboard/}}\
+	{\field{\*\fldinst{HYPERLINK "https://apontious.com/2013/01/10/keyboard-schmeeboard/"}}{\fldrslt https://apontious.com/2013/01/10/keyboard-schmeeboard/}}\
+	{\field{\*\fldinst{HYPERLINK "https://apontious.com/2017/01/07/keyboard-out-of-my-mind/"}}{\fldrslt https://apontious.com/2017/01/07/keyboard-out-of-my-mind/}}\
 \
 The code is released under the MIT license. See here for details: {\field{\*\fldinst{HYPERLINK "http://opensource.org/licenses/mit-license.php"}}{\fldrslt http://opensource.org/licenses/mit-license.php}}\
 \
-To guard against bit rot, the entirety of the post is reproduced below.\
+To guard against bit rot, both posts are reproduced in their entirety below.\
 \
 \'97 Andrew Pontious\
-1/10/2013\
+1/6/2017\
 \
-\pard\pardeftab720\sa140
+\pard\pardeftab720\sa140\partightenfactor0
 
 \f1\b\fs40 \cf2 Keyboard\'a0Schmeeboard\
-\pard\pardeftab720\sa300
+\pard\pardeftab720\sa300\partightenfactor0
 
 \b0\fs26 \cf2 (Updated! See bottom.)\
 There\'92s a lot to dislike in Apple\'92s rotation APIs.\
@@ -59,13 +63,80 @@ I\'92m actually looking for a solution to this problem right now, so if this rin
 
 \b Update:
 \b0 \
-\pard\pardeftab720\sa300
+\pard\pardeftab720\sa300\partightenfactor0
 {\field{\*\fldinst{HYPERLINK "https://twitter.com/CastIrony/status/289287950020251648"}}{\fldrslt \cf3 \ul \ulc3 Joel Bernstein tweets}}:\
-\pard\pardeftab720\li718\fi7\sa300
+\pard\pardeftab720\li718\fi7\sa300\partightenfactor0
 \cf2 @apontious You may be able to disable both hacks and use UIViewAnimationOptionBeginFromCurrentState. Tried it, seems to work.\
-\pard\pardeftab720\sa300
+\pard\pardeftab720\sa300\partightenfactor0
 \cf2 This does indeed work.\
 What he means is, dispense with trying to identify when you\'92re rotating or not. Instead, just implement the keyboard-will-show and keyboard-will-hide animations without any extra logic. But, for keyboard-will-show, specify UIViewAnimationOptionBeginFromCurrentState as one of the animation options.\
 This will override the changes that keyboard-will-hide was attempting to make, and just animate properly from the previous keyboard location to the next keyboard location. Neat.\
 I\'92ve updated the {\field{\*\fldinst{HYPERLINK "https://github.com/apontious/Keyboard-Schmeeboard"}}{\fldrslt \cf3 \ul \ulc3 GitHub project}} to have a second project in it, Corrected Keyboard Schmeeboard, with this fix.\
-Thanks, Joel!}
+Thanks, Joel!\
+\pard\pardeftab720\partightenfactor0
+
+\f3\b\fs96 \cf4 \expnd0\expndtw0\kerning0
+Keyboard out of My\'a0Mind\cf0 \
+\pard\pardeftab720\partightenfactor0
+{\field{\*\fldinst{HYPERLINK "https://apontious.com/2013/01/10/keyboard-schmeeboard/"}}{\fldrslt 
+\f4\b0\fs30 \cf5 \ul \ulc5 Four years ago}}
+\f4\b0\fs30 \cf6  (!) I wrote up the best practices I could find for dealing with the appearance and disappearance\'a0of the keyboard on iOS.\
+\
+Since\'a0then, did they\'a0break?\'a0Any guesses?\
+\
+Anyone?\
+\
+Actually, they\'a0
+\i mostly
+\i0  still work.\
+\
+If you\'92ll remember, the big problem was that iOS simply 
+\i wouldn\'92t tell us
+\i0  when we were rotating. Instead, the news was delivered in separate, unconnected\'a0keyboard-will-hide and keyboard-will-show notifications.\
+We got around that by, in the will-show notification, starting our animation from the current point (via UIViewAnimationOptionBeginFromCurrentState), instead of from all the way at the bottom of the screen.\
+On iPhone for iOS 10, as far as I can tell, that trick doesn\'92t work anymore. (It still does on iPad.) Your animation begins at the bottom of the screen, out of sync with the actual keyboard movement, no matter what options you set.\
+\
+But in the meantime, iOS has introduced an API that\'a0
+\i does
+\i0 \'a0give us access points both for the start and end of a rotation animation,\'a0
+\f2 viewWillTransitionToSize:withTransitionCoordinator:
+\f4 .\
+This\'a0method is called at the start of the rotation, so that\'92s one\'a0access point accounted for.\
+And if you call the transition coordinator\'92s\'a0
+\f2 animateAlongsideTransition:completion:
+\f4  method with a completion block inside it, per Apple\'92s best practices,\'a0the\'a0completion block is where you can do things guaranteed to occur after the rotation is over. So that\'92s the second access point accounted for.\
+\
+\pard\pardeftab720\partightenfactor0
+
+\f2 \cf6 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id)coordinator \{\
+    [super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];\
+    // BEGINNING OF ROTATION\
+    [coordinator animateAlongsideTransition:^(id  _Nonnull context) \{\
+    \} completion:^(id  _Nonnull context) \{\
+        // END OF ROTATION\
+    \}];\
+\}\
+
+\f4 \
+Now, this API is meant to be more general-purpose than just rotation: it\'92s called for every multitasking size change on iPad. But we can find out\'a0whether it is a rotation transition by checking whether the\'a0
+\i new
+\i0  size\'92s width and height are the same as the\'a0
+\i old
+\i0  size\'92s height and width. If it is, now we set\'a0a flag that, in our will-hide logic, can be used to\'a0
+\i not
+\i0  animate at all under these circumstances.\
+\
+So that\'92s it! One fairly small fix.\
+\
+However, since it has been four years (!), I\'92ve made a number of changes beyond that in the {\field{\*\fldinst{HYPERLINK "https://github.com/apontious/Keyboard-Schmeeboard"}}{\fldrslt \cf5 \ul \ulc5 GitHub project}}:\
+\
+\pard\tx220\tx720\pardeftab720\li720\fi-720\partightenfactor0
+\ls1\ilvl0\cf6 \kerning1\expnd0\expndtw0 {\listtext	\'95	}\expnd0\expndtw0\kerning0
+A new project, Corrected Keyboard Schmeeboard2, has been updated to Xcode 8 standards, Auto Layout, and more, without otherwise changing the code.\
+\ls1\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\'95	}\expnd0\expndtw0\kerning0
+A second new\'a0project,\'a0Corrected Keyboard Schmeeboard3, has the iOS 10 iPhone rotation fix on top of the changes from 2.\
+\ls1\ilvl0\kerning1\expnd0\expndtw0 {\listtext	\'95	}\expnd0\expndtw0\kerning0
+And the last new project,\'a0Corrected Keyboard Schmeeboard4, converts the whole thing into Swift.\
+\pard\pardeftab720\partightenfactor0
+\cf6 \
+I\'92ll have more to say about Swift in future posts.}
