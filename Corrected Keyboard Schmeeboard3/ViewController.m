@@ -18,7 +18,7 @@
 
 @property (nonatomic) IBOutlet NSLayoutConstraint *bottomLayoutConstraint;
 
-@property (nonatomic) BOOL inRotation;
+@property (nonatomic) BOOL inPhoneRotation;
 
 @end
 
@@ -64,12 +64,13 @@
 
 - (void)viewWillTransitionToSize:(CGSize)size withTransitionCoordinator:(id<UIViewControllerTransitionCoordinator>)coordinator {
 	[super viewWillTransitionToSize:size withTransitionCoordinator:coordinator];
-	if (self.view.bounds.size.height == size.width && self.view.bounds.size.width == size.height) {
-		self.inRotation = YES;
+	if ([[UIDevice currentDevice] userInterfaceIdiom] == UIUserInterfaceIdiomPhone &&
+		self.view.bounds.size.height == size.width && self.view.bounds.size.width == size.height) {
+		self.inPhoneRotation = YES;
 	}
 	[coordinator animateAlongsideTransition:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
 	} completion:^(id<UIViewControllerTransitionCoordinatorContext>  _Nonnull context) {
-		self.inRotation = NO;
+		self.inPhoneRotation = NO;
 	}];
 }
 
@@ -87,7 +88,7 @@
 }
 - (void)willHideKeyboard:(NSNotification *)notification {
     [self handleKeyboardNotification:notification handler:^(const CGRect frameBegin, const CGRect frameEnd, const double animationDuration, const UIViewAnimationOptions animationOptions) {
-		if (self.inRotation) {
+		if (self.inPhoneRotation) {
 			return;
 		}
 		[self.view layoutIfNeeded];

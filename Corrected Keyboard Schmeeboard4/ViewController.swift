@@ -21,7 +21,7 @@ class ViewController: UIViewController {
 	@IBOutlet weak var textField: UITextField!
 	@IBOutlet weak var bottomLayoutConstraint: NSLayoutConstraint!
 	
-	private var inRotation: Bool = false
+	private var inPhoneRotation: Bool = false
 	
 	// Convenience method to turn keyboard notification into usable parameters.
 	private func handleKeyboardNotification(_ notification: NSNotification,
@@ -73,12 +73,12 @@ class ViewController: UIViewController {
 	override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
 		super.viewWillTransition(to: size, with: coordinator)
 		
-		if view.bounds.size.height == size.width && view.bounds.size.width == size.height {
-			inRotation = true
+		if UIDevice.current.userInterfaceIdiom == .phone && view.bounds.size.height == size.width && view.bounds.size.width == size.height {
+			inPhoneRotation = true
 		}
 		coordinator.animate(alongsideTransition: { (context: UIViewControllerTransitionCoordinatorContext) in
 		}) { (context: UIViewControllerTransitionCoordinatorContext) in
-			self.inRotation = false
+			self.inPhoneRotation = false
 		}
 	}
 	
@@ -98,7 +98,7 @@ class ViewController: UIViewController {
 	
 	func willHideKeyboard(_ notification: NSNotification) {
 		handleKeyboardNotification(notification) { (frameBegin: CGRect, frameEnd: CGRect, animationDuration: Double, animationOptions: UIViewAnimationOptions) in
-			if self.inRotation {
+			if self.inPhoneRotation {
 				return
 			}
 			self.view.layoutIfNeeded()
